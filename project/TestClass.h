@@ -3,6 +3,9 @@
 #include "Object3d.h"
 #include "MyMath.h"
 
+#include "Levelediter.h"
+#include "Player.h"
+#include "Enemy.h"
 
 class TestClass {
 public:
@@ -21,4 +24,8 @@ private:
 	Object3d* object2_ = nullptr;
 	Camera* camera_ = nullptr;
 	bool onLight = false;
+
+	Levelediter levelediter;
+	Player* player_ = nullptr;
+	Enemy* enemy_ = nullptr;
 };

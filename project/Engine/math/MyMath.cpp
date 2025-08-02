@@ -46,6 +46,18 @@ namespace MyMath {
 		return v * f;
 	}
 
+	Vector3 operator/(const Vector3& v, const float f) {
+		Vector3 result;
+		result.x = v.x / f;
+		result.y = v.y / f;
+		result.z = v.z / f;
+		return result;
+	}
+
+	Vector3 operator/(const float f, const Vector3& v) {
+		return v / f;
+	}
+
 	Vector3& operator+=(Vector3& v1, const Vector3& v2) {
 		v1.x += v2.x;
 		v1.y += v2.y;
@@ -214,6 +226,15 @@ namespace MyMath {
 	}
 
 
+	// AABBの衝突判定
+	bool IsCollisionAABB(const AABB& aabb1, const AABB& aabb2) {
+		if ((aabb1.min.x <= aabb2.max.x && aabb1.max.x >= aabb2.min.x) && //x軸
+			(aabb1.min.y <= aabb2.max.y && aabb1.max.y >= aabb2.min.y) && //y軸
+			(aabb1.min.z <= aabb2.max.z && aabb1.max.z >= aabb2.min.z)) { //z軸
+			return true;
+		}
+		return false;
+	}
 
 
 
@@ -247,9 +268,10 @@ namespace MyMath {
 
 	Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
 
-		Matrix4x4 resultX = MakeRotateXMatrix(rotate.x);
-		Matrix4x4 resultY = MakeRotateYMatrix(rotate.y);
-		Matrix4x4 resultZ = MakeRotateZMatrix(rotate.z);
+		//角度に合わせる
+		Matrix4x4 resultX = MakeRotateXMatrix(rotate.x * -(float(M_PI) / 180.0f));
+		Matrix4x4 resultY = MakeRotateYMatrix(rotate.y * -(float(M_PI) / 180.0f));
+		Matrix4x4 resultZ = MakeRotateZMatrix(rotate.z * -(float(M_PI) / 180.0f));
 
 		Matrix4x4 rotateXYZ = Multiply(resultX, Multiply(resultY, resultZ));
 

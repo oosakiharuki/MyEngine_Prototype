@@ -1,28 +1,54 @@
 #include "GameScene.h"
 
+using namespace MyMath;
+
 void GameScene::Initialize() {
 	
 	ModelManager::GetInstance()->LoadModel("terrain");
 	ModelManager::GetInstance()->LoadModel("sphere");
+	ModelManager::GetInstance()->LoadModel("playerHead");
+	ModelManager::GetInstance()->LoadModel("enemy");
 
 
 	camera = new Camera();
-	//Vector3 cameraRotate = { 1.4f,0.0f,0.0f };
-	//Vector3 cameraTranslate = { 0.0f,30.0f,-8.0f };
-	cameraRotate = { 0.3f,0.0f,0.0f };
-	cameraTranslate = { 0.0f,5.0f,-16.0f };
 
+	//levelediter = new Levelediter();
+	levelediter.LoadLevelediter();
+
+	cameraRotate = levelediter.GetLevelData()->cameraInit.rotation;
+	cameraTranslate = levelediter.GetLevelData()->cameraInit.translation;
+	
 	camera->SetRotate(cameraRotate);
 	camera->SetTranslate(cameraTranslate);
-	
+
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera);
 	ParticleCommon::GetInstance()->SetDefaultCamera(camera);
 
- 	testClass = new TestClass();
- 	testClass->Init();
 
-	spriteUI = new Sprite();
-	spriteUI->Initialize("uvChecker.png");
+	player_ = new Player();
+	player_->Initialize();
+
+	//プレイヤー配置データがあるときプレイヤーを配置
+	if (!levelediter.GetLevelData()->players.empty()) {
+		auto& playerData = levelediter.GetLevelData()->players[0];
+		player_->SetTranslate(playerData.translation);
+		player_->SetRotate(playerData.rotation);
+		player_->SetAABB(playerData.colliderAABB);
+	}
+
+
+	if (!levelediter.GetLevelData()->spawnEnemies.empty()) {
+		for (auto& enemyData : levelediter.GetLevelData()->spawnEnemies) {
+			Enemy* enemy = new Enemy();
+			enemy->Initialize();
+			enemy->SetTranslate(enemyData.translation);
+			enemy->SetRotate(enemyData.rotation);
+			enemy->SetAABB(enemyData.colliderAABB);
+			enemies.push_back(enemy);
+		}
+	}
+
+
 }
 
 void GameScene::Update() {
@@ -40,45 +66,37 @@ void GameScene::Update() {
 	//	sceneNo = Title;
 	//}
 
-	testClass->Update();
-
 	camera->Update();
 
-	spriteUI->SetPosition({ 10,10 });
-	spriteUI->SetSize(Vector2(128, 128));
-	spriteUI->Update();
+	player_->Update();
+
+	for (auto& enemy : enemies) {
+		enemy->Update();
+
+		if (IsCollisionAABB(player_->GetAABB(), enemy->GetAABB())) {
+			enemy->IsHit();
+		}
+	}
+
 
 #ifdef  USE_IMGUI
-
-	//ここにテキストを入れられる
-
-	//開発用UIの処理
-	//ImGui::ShowDemoWindow();
 
 	ImGui::Begin("camera");
 	ImGui::Text("ImGuiText");
 
 	//カメラ
-	ImGui::SliderFloat3("cameraTranslate", &cameraTranslate.x, -30.0f, 30.0f);
+	ImGui::InputFloat3("cameraTranslate", &cameraTranslate.x);
+	ImGui::SliderFloat3("cameraTranslateSlider", &cameraTranslate.x, -30.0f, 30.0f);
 
-	ImGui::SliderFloat("cameraRotateX", &cameraRotate.x, -10.0f, 10.0f);
-	ImGui::SliderFloat("cameraRotateY", &cameraRotate.y, -10.0f, 10.0f);
-	ImGui::SliderFloat("cameraRotateZ", &cameraRotate.z, -10.0f, 10.0f);
+	ImGui::InputFloat3("cameraRotate", &cameraRotate.x);
+	ImGui::SliderFloat("cameraRotateX", &cameraRotate.x, -360.0f, 360.0f);
+	ImGui::SliderFloat("cameraRotateY", &cameraRotate.y, -360.0f, 360.0f);
+	ImGui::SliderFloat("cameraRotateZ", &cameraRotate.z, -360.0f, 360.0f);
 	camera->SetRotate(cameraRotate);
 	camera->SetTranslate(cameraTranslate);
 
 	ImGui::End();
 
-#ifdef _DEBUG
-
-	ImGui::Begin("TestTexture");
-
-	ImGui::InputFloat2("VertexModel", &position.x);
-	ImGui::SliderFloat2("SliderVertexModel", &position.x, 0.0f, 600.0f);
-
-	ImGui::End();
-	spriteUI->SetPosition(position);
-#endif // _DEBUG
 #endif //  USE_IMGUI
 }
 
@@ -87,23 +105,24 @@ void GameScene::Draw() {
 	//モデル描画処理
 	Object3dCommon::GetInstance()->Command();
 
-	testClass->Draw();
+	player_->Draw();
+	for (auto& enemy : enemies) {
+		enemy->Draw();
+	}
 
 	//パーティクル描画処理
 	ParticleCommon::GetInstance()->Command();
 
-	//particle->Draw();
-	//particle2->Draw();
 
 	//スプライト描画処理(UI用)
 	SpriteCommon::GetInstance()->Command();
 
-	spriteUI->Draw();
 }
-void GameScene::Finalize() {
-	
-	delete camera;
-	delete testClass;
 
-	delete spriteUI;
+void GameScene::Finalize() {
+	delete camera;
+	delete player_;
+	for (auto& enemy : enemies) {
+		delete enemy;
+	}
 }
