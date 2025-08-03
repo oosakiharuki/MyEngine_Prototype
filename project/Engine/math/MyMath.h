@@ -108,6 +108,9 @@ namespace MyMath {
 	Vector3 Normalize(const Vector3& v);
 	bool IsCollisionAABB(const AABB& aabb1, const AABB& aabb2);
 
+	Vector3 OverAABB(const AABB& aabb1, const AABB& aabb2);
+	void ReturnBack(const AABB& aabb1, const AABB& aabb2, Vector3 position);
+
 #pragma region Affine
 
 	Matrix4x4 Multiply(Matrix4x4 m1, Matrix4x4 m2);

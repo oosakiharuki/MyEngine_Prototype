@@ -237,7 +237,66 @@ namespace MyMath {
 	}
 
 
+	Vector3 OverAABB(const AABB& aabb1,const AABB& aabb2) {
+		Vector3 result;
+		float overX1 = aabb2.max.x - aabb1.min.x;
+		float overX2 = aabb1.max.x - aabb2.min.x;
 
+		//重なっているのは値が小さいほう
+		if (overX1 < overX2) {
+			result.x = overX1;
+		}
+		else {
+			result.x = overX2;
+		}
+
+		float overY1 = aabb2.max.y - aabb1.min.y;
+		float overY2 = aabb1.max.y - aabb2.min.y;
+
+		if (overY1 < overY2) {
+			result.y = overY1;
+		}
+		else {
+			result.y = overY2;
+		}
+
+		float overZ1 = aabb2.max.z - aabb1.min.z;
+		float overZ2 = aabb1.max.z - aabb2.min.z;
+
+		if (overZ1 < overZ2) {
+			result.z = overZ1;
+		}
+		else {
+			result.z = overZ2;
+		}
+
+		return result;
+	}
+	
+	void ReturnBack(const AABB& aabb1, const AABB& aabb2,Vector3 position) {
+
+		Vector3 overlap = OverAABB(aabb1, aabb2);
+
+
+		// 重なりが最小の軸で押し戻しを行う
+		if (overlap.x < overlap.y && overlap.x < overlap.z) {
+			position.x -= overlap.x;
+		}
+		else if (overlap.y < overlap.x && overlap.y < overlap.z) {
+			position.y -= overlap.y;
+			//// 上向きの押し戻しなら着地判定を立てる
+			//if (push > 0.0f) {
+			//	velocityY = 0.0f;
+			//	onGround = true;
+			//}
+		}
+		else if (overlap.z < overlap.x && overlap.z < overlap.y) {
+			position.z -= overlap.z;
+		}
+
+
+		//position -= overlap;
+	}
 
 
 #pragma region Affine

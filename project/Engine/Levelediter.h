@@ -4,7 +4,7 @@
 class Levelediter {
 public:
 
-	void LoadLevelediter();
+	void LoadLevelediter(std::string jsonName);
 
 	//LevelData型
 	struct LevelData {
@@ -13,6 +13,7 @@ public:
 			Vector3 translation;
 			Vector3 rotation;
 			Vector3 scaling;
+			AABB colliderAABB;
 		};
 		//プレイヤーのスポーン場所
 		struct PlayerSpawnData {

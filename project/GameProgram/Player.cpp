@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Input.h"
+#include "ImGuiManager.h"
 
 using namespace MyMath;
 
@@ -25,12 +26,42 @@ void Player::Update() {
 		worldTransform.translation_.x += 0.1f;
 	}
 
-	if (Input::GetInstance()->PushKey(DIK_W)) {
-		worldTransform.translation_.z += 0.1f;
+	if (isGround) {
+		grabity = 0.0f;
+		isJump = false;
 	}
-	else if (Input::GetInstance()->PushKey(DIK_S)) {
-		worldTransform.translation_.z -= 0.1f;
+	else {
+		grabity -= 0.01f;
+	}	
+
+	//ジャンプ
+	if (Input::GetInstance()->TriggerKey(DIK_W) && !isJump) {
+		isJump = true;
 	}
+
+	if (isJump) {
+		worldTransform.translation_.y += 0.2f;
+	}
+
+
+	worldTransform.translation_.y += grabity;
+
+#ifdef  USE_IMGUI
+
+	ImGui::Begin("player");
+
+	//カメラ
+	ImGui::InputFloat3("worldTransform.translate", &worldTransform.translation_.x);
+	ImGui::SliderFloat3("worldTransform.translateSlider", &worldTransform.translation_.x, -30.0f, 30.0f);
+
+	ImGui::InputFloat3("Rotate", &worldTransform.rotation_.x);
+	ImGui::SliderFloat("RotateX", &worldTransform.rotation_.x, -360.0f, 360.0f);
+	ImGui::SliderFloat("RotateY", &worldTransform.rotation_.y, -360.0f, 360.0f);
+	ImGui::SliderFloat("RotateZ", &worldTransform.rotation_.z, -360.0f, 360.0f);
+
+	ImGui::End();
+
+#endif //  USE_IMGUI
 
 	worldTransform.UpdateMatrix();
 }
@@ -48,4 +79,8 @@ AABB Player::GetAABB() {
 
 void Player::SetModelFile(std::string filename) {
 
+}
+
+void Player::OverReturn(const Vector3& over) {
+	worldTransform.translation_.y -= 0.0f;
 }

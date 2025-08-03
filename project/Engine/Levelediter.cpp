@@ -5,12 +5,12 @@
 
 using namespace MyMath;
 
-void Levelediter::LoadLevelediter() {
+void Levelediter::LoadLevelediter(std::string jsonName) {
 	//json
 	levelData = new LevelData();
 
 	//ファイルを選択
-	const std::string fullpath = "resource/Levelediter/scene_camera.json";
+	const std::string fullpath = jsonName;
 
 	//ファイルストリーム
 	std::ifstream file;
@@ -78,6 +78,19 @@ void Levelediter::LoadLevelediter() {
 			objectData.scaling.x = (float)transform["scaling"][0];
 			objectData.scaling.y = (float)transform["scaling"][2];
 			objectData.scaling.z = (float)transform["scaling"][1];
+			
+			//コライダー
+			nlohmann::json& collider = object["collider"];
+
+			if (collider != nullptr) {
+				//Vectorに変換
+				Vector3 center = { (float)collider["center"][0],(float)collider["center"][2], (float)collider["center"][1] };
+				Vector3 size = { (float)collider["size"][0],(float)collider["size"][2], (float)collider["size"][1] };
+
+				//AABBに追加+objのサイズに合わせて
+				objectData.colliderAABB.min = center - (size * objectData.scaling / 2.0f);
+				objectData.colliderAABB.max = center + (size * objectData.scaling / 2.0f);
+			}
 		}
 		else if (type.compare("PlayerSpawn") == 0) {
 			//要素追加
@@ -104,17 +117,15 @@ void Levelediter::LoadLevelediter() {
 			//コライダー
 			nlohmann::json& collider = object["collider"];
 
-			if (collider == nullptr) {
-				continue;
+			if (collider != nullptr) {				
+				//Vectorに変換
+				Vector3 center = { (float)collider["center"][0],(float)collider["center"][2], (float)collider["center"][1] };
+				Vector3 size = { (float)collider["size"][0],(float)collider["size"][2], (float)collider["size"][1] };
+
+				//AABBに追加
+				playerSpawnData.colliderAABB.min = center - (size / 2.0f);
+				playerSpawnData.colliderAABB.max = center + (size / 2.0f);
 			}
-
-			//Vectorに変換
-			Vector3 center = { (float)collider["center"][0],(float)collider["center"][2], (float)collider["center"][1] };
-			Vector3 size = { (float)collider["size"][0],(float)collider["size"][2], (float)collider["size"][1] };
-
-			//AABBに追加
-			playerSpawnData.colliderAABB.min = center - (size / 2.0f);
-			playerSpawnData.colliderAABB.max = center + (size / 2.0f);
 		}
 		else if (type.compare("EnemySpawn") == 0) {
 			//要素追加
@@ -144,17 +155,16 @@ void Levelediter::LoadLevelediter() {
 			//コライダー
 			nlohmann::json& collider = object["collider"];
 
-			if (collider == nullptr) {
-				continue;
+			if (collider != nullptr) {
+
+				//Vectorに変換
+				Vector3 center = { (float)collider["center"][0],(float)collider["center"][2], (float)collider["center"][1] };
+				Vector3 size = { (float)collider["size"][0],(float)collider["size"][2], (float)collider["size"][1] };
+
+				//AABBに追加
+				enemySpawnData.colliderAABB.min = center - (size / 2.0f);
+				enemySpawnData.colliderAABB.max = center + (size / 2.0f);
 			}
-
-			//Vectorに変換
-			Vector3 center = { (float)collider["center"][0],(float)collider["center"][2], (float)collider["center"][1] };
-			Vector3 size = { (float)collider["size"][0],(float)collider["size"][2], (float)collider["size"][1] };
-
-			//AABBに追加
-			enemySpawnData.colliderAABB.min = center - (size / 2.0f);
-			enemySpawnData.colliderAABB.max = center + (size / 2.0f);
 		}
 		else if (type.compare("CAMERA") == 0) {
 			//要素追加
@@ -179,52 +189,5 @@ void Levelediter::LoadLevelediter() {
 
 		}
 	}
-
-	//for (auto& objectData : levelData->objects) {
-	//	//ファイル名から登録済みのモデル検索
-	//	Object3d* newObject = new Object3d();
-	//	newObject->Initialize();
-	//	newObject->SetModelFile(objectData.fileName);
-	//	objects.push_back(newObject);
-	//}
-
-	//for (auto& objectData : levelData->objects) {
-
-	//	WorldTransform* newObject = new WorldTransform();
-	//	newObject->Initialize();
-
-	//	newObject->translation_ = objectData.translation;
-
-	//	newObject->rotation_ = objectData.rotation;
-
-	//	newObject->scale_ = objectData.scaling;
-
-	//	worldTransforms.push_back(newObject);
-	//}
-
-	//player = new Player();
-	//player->Initialize();
-
-	////プレイヤー配置データがあるときプレイヤーを配置
-	//if (!levelData->players.empty()) {
-	//	auto& playerData = levelData->players[0];
-	//	player->SetTranslate(playerData.translation);
-	//	player->SetRotate(playerData.rotation);
-	//	player->SetAABB(playerData.colliderAABB);
-	//}
-
-	//if (!levelData->spawnEnemies.empty()) {
-	//	for (auto& enemyData : levelData->spawnEnemies) {
-	//		Enemy* enemy = new Enemy();
-	//		enemy->Initialize();
-	//		enemy->SetTranslate(enemyData.translation);
-	//		enemy->SetRotate(enemyData.rotation);
-	//		enemy->SetAABB(enemyData.colliderAABB);
-	//		enemies.push_back(enemy);
-	//	}
-	//}
-
-	//camera->SetRotate(cameraRotate);
-	//camera->SetTranslate(cameraTranslate);
 
 }

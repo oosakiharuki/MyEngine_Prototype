@@ -8,12 +8,13 @@ void GameScene::Initialize() {
 	ModelManager::GetInstance()->LoadModel("sphere");
 	ModelManager::GetInstance()->LoadModel("playerHead");
 	ModelManager::GetInstance()->LoadModel("enemy");
+	ModelManager::GetInstance()->LoadModel("stage_proto");
 
 
 	camera = new Camera();
 
 	//levelediter = new Levelediter();
-	levelediter.LoadLevelediter();
+	levelediter.LoadLevelediter("resource/Levelediter/scene_stage02.json");
 
 	cameraRotate = levelediter.GetLevelData()->cameraInit.rotation;
 	cameraTranslate = levelediter.GetLevelData()->cameraInit.translation;
@@ -48,7 +49,28 @@ void GameScene::Initialize() {
 		}
 	}
 
+	if (!levelediter.GetLevelData()->objects.empty()) {
+		for (auto& object : levelediter.GetLevelData()->objects) {
 
+			Vector3 position = object.translation;
+
+			AABB aabb;
+			aabb.min = position + object.colliderAABB.min;
+			aabb.max = position + object.colliderAABB.max;
+
+			stagesAABB.push_back(aabb);
+		}
+	}
+
+	worldTransformCamera_.Initialize();
+	camera->SetParent(&worldTransformCamera_);
+	worldTransformCamera_.parent_ = &player_->GetWorldTransform();
+
+	stageobj = new Object3d();
+	stageobj->Initialize();
+	stageobj->SetModelFile("stage_proto");
+
+	wt.Initialize();
 }
 
 void GameScene::Update() {
@@ -70,6 +92,8 @@ void GameScene::Update() {
 
 	player_->Update();
 
+	stageobj->Update();
+
 	for (auto& enemy : enemies) {
 		enemy->Update();
 
@@ -78,6 +102,36 @@ void GameScene::Update() {
 		}
 	}
 
+	for (auto& stage : stagesAABB) {
+		if (IsCollisionAABB(player_->GetAABB(), stage)) {
+
+			Vector3 position = player_->GetTranslate();
+			Vector3 overlap = OverAABB(player_->GetAABB(), stage);
+
+			// 重なりが最小の軸で押し戻しを行う
+			if (overlap.x < overlap.y && overlap.x < overlap.z) {
+				position.x -= overlap.x;
+			}
+			else if (overlap.y < overlap.x && overlap.y < overlap.z) {
+				position.y += overlap.y;
+				// 上向きの押し戻しなら着地判定を立てる
+				player_->IsGround(true);
+			}
+			else if (overlap.z < overlap.x && overlap.z < overlap.y) {
+				position.z -= overlap.z;
+			}
+			
+			player_->SetTranslate(position);
+
+			break;
+		}
+		else {
+			player_->IsGround(false);
+		}
+
+	}
+	wt.UpdateMatrix();
+	worldTransformCamera_.UpdateMatrix();
 
 #ifdef  USE_IMGUI
 
@@ -104,6 +158,8 @@ void GameScene::Draw() {
 
 	//モデル描画処理
 	Object3dCommon::GetInstance()->Command();
+	
+	stageobj->Draw(wt);
 
 	player_->Draw();
 	for (auto& enemy : enemies) {
@@ -125,4 +181,5 @@ void GameScene::Finalize() {
 	for (auto& enemy : enemies) {
 		delete enemy;
 	}
+	delete stageobj;
 }

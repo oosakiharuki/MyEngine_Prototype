@@ -25,8 +25,15 @@ private:
 	Camera* camera = nullptr;
 	Vector3 cameraRotate = { 0.0f,0.0f,0.0f };
 	Vector3 cameraTranslate = { 0.0f,0.0f,-15.0f };
+	WorldTransform worldTransformCamera_;
 
 	Levelediter levelediter;
 	Player* player_ = nullptr;
 	std::vector<Enemy*> enemies;
+
+	Object3d* stageobj;
+	WorldTransform wt;
+
+	//ステージの足場
+	std::vector<AABB> stagesAABB;
 };
