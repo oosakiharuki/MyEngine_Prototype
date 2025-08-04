@@ -156,7 +156,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\PostEffect\IPostEffects.cpp" />
     <ClCompile Include="GameProgram\Enemy.cpp" />
     <ClCompile Include="GameProgram\Player.cpp" />
-    <ClCompile Include="TestClass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\2d\ImGuiManager.h" />
@@ -209,7 +208,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\PostEffect\IPostEffects.h" />
     <ClInclude Include="GameProgram\Enemy.h" />
     <ClInclude Include="GameProgram\Player.h" />
-    <ClInclude Include="TestClass.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
