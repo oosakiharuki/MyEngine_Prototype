@@ -48,6 +48,8 @@ void Framework::Initialize() {
 	postEffectM = PostEffectManager::GetInstance();
 	postEffectM->Initialize(dxCommon);
 
+	audio_ = Audio::GetInstance();
+	audio_->Initialize();
 }
 
 void Framework::Update() {
@@ -89,6 +91,8 @@ void Framework::Finalize() {
 
 	//postEffect->Finalize();
 	postEffectM->Finalize();
+
+	audio_->Finalize();
 }
 
 

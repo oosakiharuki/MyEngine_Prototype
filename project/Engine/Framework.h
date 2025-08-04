@@ -16,6 +16,8 @@
 
 #include "PostEffectManager.h"
 
+#include "Audio.h"
+
 
 class Framework{
 public:
@@ -42,6 +44,7 @@ private:
 
 
 	PostEffectManager* postEffectM = nullptr;
+	Audio* audio_;
 
 	bool isRequst = false;
 };

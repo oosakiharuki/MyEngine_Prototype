@@ -3,7 +3,7 @@
 using namespace MyMath;
 
 void GameScene::Initialize() {
-	
+
 	ModelManager::GetInstance()->LoadModel("terrain");
 	ModelManager::GetInstance()->LoadModel("sphere");
 	ModelManager::GetInstance()->LoadModel("playerHead");
@@ -18,7 +18,7 @@ void GameScene::Initialize() {
 
 	cameraRotate = levelediter.GetLevelData()->cameraInit.rotation;
 	cameraTranslate = levelediter.GetLevelData()->cameraInit.translation;
-	
+
 	camera->SetRotate(cameraRotate);
 	camera->SetTranslate(cameraTranslate);
 
@@ -71,9 +71,19 @@ void GameScene::Initialize() {
 	stageobj->SetModelFile("stage_proto");
 
 	wt.Initialize();
+
+	BGMData_ = Audio::GetInstance()->LoadWave("resource/sound/title.wav");
+	soundData_ = Audio::GetInstance()->LoadWave("resource/sound/bane.wav");
+
+	Audio::GetInstance()->SoundPlayWave(BGMData_, 0.3f, true);
 }
 
 void GameScene::Update() {
+	
+	
+	if (Input::GetInstance()->TriggerKey(DIK_2)) {
+		Audio::GetInstance()->SoundPlayWave(soundData_, 0.3f,false);
+	}
 
 	if (Input::GetInstance()->PushKey(DIK_0)) {
 		OutputDebugStringA("Hit 0\n");
@@ -149,9 +159,14 @@ void GameScene::Update() {
 	camera->SetRotate(cameraRotate);
 	camera->SetTranslate(cameraTranslate);
 
+	ImGui::SliderFloat("volume", &volume, 0.0f, 1.0f);
+
+
 	ImGui::End();
 
 #endif //  USE_IMGUI
+
+	Audio::GetInstance()->ControlVolume(BGMData_, volume);
 }
 
 void GameScene::Draw() {

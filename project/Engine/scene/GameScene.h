@@ -36,4 +36,9 @@ private:
 
 	//ステージの足場
 	std::vector<AABB> stagesAABB;
+
+	//テスト音源
+	SoundData soundData_;
+	SoundData BGMData_;
+	float volume = 0.3f;
 };
