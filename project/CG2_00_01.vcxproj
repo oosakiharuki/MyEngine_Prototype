@@ -91,7 +91,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d;$(ProjectDir)Engine\3d;$(ProjectDir)Engine\base;$(ProjectDir)Engine\math;$(ProjectDir)Engine\input;$(ProjectDir)Engine\audio;$(ProjectDir)Engine\scene;$(ProjectDir)Engine;$(ProjectDir)Engine\PostEffect;$(ProjectDir)GameProgram;$(ProjectDir)externals\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d;$(ProjectDir)Engine\3d;$(ProjectDir)Engine\base;$(ProjectDir)Engine\math;$(ProjectDir)Engine\input;$(ProjectDir)Engine\audio;$(ProjectDir)Engine\scene;$(ProjectDir)Engine;$(ProjectDir)Engine\PostEffect;$(ProjectDir)GameProgram;$(ProjectDir)externals\assimp\include;$(ProjectDir)Engine\3d\_gltf;$(ProjectDir)Engine\3d\_obj;$(ProjectDir)Engine\3d\_Particle;$(ProjectDir)Engine\3d\Primitive</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -107,19 +107,19 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BoxModel.cpp" />
-    <ClCompile Include="Cubemap.cpp" />
-    <ClCompile Include="DebugWireframes.cpp" />
+    <ClCompile Include="Engine\3d\Primitive\BoxModel.cpp" />
+    <ClCompile Include="Engine\3d\Cubemap.cpp" />
+    <ClCompile Include="Engine\3d\DebugWireframes.cpp" />
     <ClCompile Include="Engine\2d\ImGuiManager.cpp" />
     <ClCompile Include="Engine\3d\Camera.cpp" />
-    <ClCompile Include="Engine\3d\GLTFCommon.cpp" />
-    <ClCompile Include="Engine\3d\Model_obj.cpp" />
-    <ClCompile Include="Engine\3d\Model__glTF.cpp" />
-    <ClCompile Include="Engine\3d\Object_glTF.cpp" />
-    <ClCompile Include="Engine\3d\Particle.cpp" />
-    <ClCompile Include="Engine\3d\ParticleCommon.cpp" />
-    <ClCompile Include="Engine\3d\ParticleEmitter.cpp" />
-    <ClCompile Include="Engine\3d\ParticleManager.cpp" />
+    <ClCompile Include="Engine\3d\_gltf\GLTFCommon.cpp" />
+    <ClCompile Include="Engine\3d\_obj\Model_obj.cpp" />
+    <ClCompile Include="Engine\3d\_gltf\Model__glTF.cpp" />
+    <ClCompile Include="Engine\3d\_gltf\Object_glTF.cpp" />
+    <ClCompile Include="Engine\3d\_Particle\Particle.cpp" />
+    <ClCompile Include="Engine\3d\_Particle\ParticleCommon.cpp" />
+    <ClCompile Include="Engine\3d\_Particle\ParticleEmitter.cpp" />
+    <ClCompile Include="Engine\3d\_Particle\ParticleManager.cpp" />
     <ClCompile Include="Engine\audio\Audio.cpp" />
     <ClCompile Include="Engine\base\D3DResorceLeakChecker.cpp" />
     <ClCompile Include="Engine\base\DirectXCommon.cpp" />
@@ -151,8 +151,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\3d\ModelCommon.cpp" />
     <ClCompile Include="Engine\3d\ModelManager.cpp" />
     <ClCompile Include="Engine\math\MyMath.cpp" />
-    <ClCompile Include="Engine\3d\Object3d.cpp" />
-    <ClCompile Include="Engine\3d\Object3dCommon.cpp" />
+    <ClCompile Include="Engine\3d\_obj\Object3d.cpp" />
+    <ClCompile Include="Engine\3d\_obj\Object3dCommon.cpp" />
     <ClCompile Include="Engine\2d\Sprite.cpp" />
     <ClCompile Include="Engine\2d\SpriteCommon.cpp" />
     <ClCompile Include="Engine\base\StringUtility.cpp" />
@@ -166,22 +166,22 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\PostEffect\IPostEffects.cpp" />
     <ClCompile Include="GameProgram\Enemy.cpp" />
     <ClCompile Include="GameProgram\Player.cpp" />
-    <ClCompile Include="SphereModel.cpp" />
+    <ClCompile Include="Engine\3d\Primitive\SphereModel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BoxModel.h" />
-    <ClInclude Include="Cubemap.h" />
-    <ClInclude Include="DebugWireframes.h" />
+    <ClInclude Include="Engine\3d\Primitive\BoxModel.h" />
+    <ClInclude Include="Engine\3d\Cubemap.h" />
+    <ClInclude Include="Engine\3d\DebugWireframes.h" />
     <ClInclude Include="Engine\2d\ImGuiManager.h" />
     <ClInclude Include="Engine\3d\Camera.h" />
-    <ClInclude Include="Engine\3d\GLTFCommon.h" />
-    <ClInclude Include="Engine\3d\Model_glTF.h" />
-    <ClInclude Include="Engine\3d\Model_obj.h" />
-    <ClInclude Include="Engine\3d\Object_glTF.h" />
-    <ClInclude Include="Engine\3d\Particle.h" />
-    <ClInclude Include="Engine\3d\ParticleCommon.h" />
-    <ClInclude Include="Engine\3d\ParticleEmitter.h" />
-    <ClInclude Include="Engine\3d\ParticleManager.h" />
+    <ClInclude Include="Engine\3d\_gltf\GLTFCommon.h" />
+    <ClInclude Include="Engine\3d\_gltf\Model_glTF.h" />
+    <ClInclude Include="Engine\3d\_obj\Model_obj.h" />
+    <ClInclude Include="Engine\3d\_gltf\Object_glTF.h" />
+    <ClInclude Include="Engine\3d\_Particle\Particle.h" />
+    <ClInclude Include="Engine\3d\_Particle\ParticleCommon.h" />
+    <ClInclude Include="Engine\3d\_Particle\ParticleEmitter.h" />
+    <ClInclude Include="Engine\3d\_Particle\ParticleManager.h" />
     <ClInclude Include="Engine\audio\Audio.h" />
     <ClInclude Include="Engine\base\D3DResorceLeakChecker.h" />
     <ClInclude Include="Engine\base\DirectXCommon.h" />
@@ -208,8 +208,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\scene\IScene.h" />
     <ClInclude Include="Engine\math\MyMath.h" />
     <ClInclude Include="Engine\math\Matrix4x4.h" />
-    <ClInclude Include="Engine\3d\Object3d.h" />
-    <ClInclude Include="Engine\3d\Object3dCommon.h" />
+    <ClInclude Include="Engine\3d\_obj\Object3d.h" />
+    <ClInclude Include="Engine\3d\_obj\Object3dCommon.h" />
     <ClInclude Include="Engine\2d\Sprite.h" />
     <ClInclude Include="Engine\2d\SpriteCommon.h" />
     <ClInclude Include="Engine\base\StringUtility.h" />
@@ -225,7 +225,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\PostEffect\IPostEffects.h" />
     <ClInclude Include="GameProgram\Enemy.h" />
     <ClInclude Include="GameProgram\Player.h" />
-    <ClInclude Include="SphereModel.h" />
+    <ClInclude Include="Engine\3d\Primitive\SphereModel.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

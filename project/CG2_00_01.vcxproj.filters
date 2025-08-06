@@ -43,6 +43,18 @@
     <Filter Include="ソース ファイル\GameProgram">
       <UniqueIdentifier>{3cede06d-47e6-4f4c-9759-d4b88a455e9d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Engine\3d\_gltf">
+      <UniqueIdentifier>{7dd7b758-fb2b-43e2-a84e-6193a2dcc8ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\3d\_obj">
+      <UniqueIdentifier>{727cc592-5d53-493e-97fb-4a6a734d0d69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\3d\_Particle">
+      <UniqueIdentifier>{d8d85738-7095-4115-93c0-678e0261052d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\3d\Primitive">
+      <UniqueIdentifier>{fe0ca8ca-e9ff-405f-a10f-d7bf3d7f1fdd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\2d\Sprite.cpp">
@@ -59,12 +71,6 @@
     </ClCompile>
     <ClCompile Include="Engine\2d\TextureManager.cpp">
       <Filter>ソース ファイル\Engine\2d</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\3d\Object3d.cpp">
-      <Filter>ソース ファイル\Engine\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\3d\Object3dCommon.cpp">
-      <Filter>ソース ファイル\Engine\3d</Filter>
     </ClCompile>
     <ClCompile Include="Engine\base\DirectXCommon.cpp">
       <Filter>ソース ファイル\Engine\base</Filter>
@@ -92,18 +98,6 @@
     </ClCompile>
     <ClCompile Include="Engine\base\SrvManager.cpp">
       <Filter>ソース ファイル\Engine\base</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\3d\ParticleManager.cpp">
-      <Filter>ソース ファイル\Engine\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\3d\ParticleCommon.cpp">
-      <Filter>ソース ファイル\Engine\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\3d\Particle.cpp">
-      <Filter>ソース ファイル\Engine\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\3d\ParticleEmitter.cpp">
-      <Filter>ソース ファイル\Engine\3d</Filter>
     </ClCompile>
     <ClCompile Include="Engine\2d\ImGuiManager.cpp">
       <Filter>ソース ファイル\Engine\2d</Filter>
@@ -180,29 +174,47 @@
     <ClCompile Include="GameProgram\Player.cpp">
       <Filter>ソース ファイル\GameProgram</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\3d\GLTFCommon.cpp">
+    <ClCompile Include="Engine\3d\_gltf\GLTFCommon.cpp">
+      <Filter>ソース ファイル\Engine\3d\_gltf</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\3d\_gltf\Model__glTF.cpp">
+      <Filter>ソース ファイル\Engine\3d\_gltf</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\3d\_gltf\Object_glTF.cpp">
+      <Filter>ソース ファイル\Engine\3d\_gltf</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\3d\_obj\Model_obj.cpp">
+      <Filter>ソース ファイル\Engine\3d\_obj</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\3d\_obj\Object3d.cpp">
+      <Filter>ソース ファイル\Engine\3d\_obj</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\3d\_obj\Object3dCommon.cpp">
+      <Filter>ソース ファイル\Engine\3d\_obj</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\3d\_Particle\Particle.cpp">
+      <Filter>ソース ファイル\Engine\3d\_Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\3d\_Particle\ParticleCommon.cpp">
+      <Filter>ソース ファイル\Engine\3d\_Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\3d\_Particle\ParticleEmitter.cpp">
+      <Filter>ソース ファイル\Engine\3d\_Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\3d\_Particle\ParticleManager.cpp">
+      <Filter>ソース ファイル\Engine\3d\_Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\3d\Primitive\BoxModel.cpp">
+      <Filter>ソース ファイル\Engine\3d\Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\3d\Primitive\SphereModel.cpp">
+      <Filter>ソース ファイル\Engine\3d\Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\3d\Cubemap.cpp">
       <Filter>ソース ファイル\Engine\3d</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\3d\Model__glTF.cpp">
+    <ClCompile Include="Engine\3d\DebugWireframes.cpp">
       <Filter>ソース ファイル\Engine\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\3d\Model_obj.cpp">
-      <Filter>ソース ファイル\Engine\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\3d\Object_glTF.cpp">
-      <Filter>ソース ファイル\Engine\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="BoxModel.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Cubemap.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugWireframes.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="SphereModel.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -219,12 +231,6 @@
       <Filter>ソース ファイル\Engine\3d</Filter>
     </ClInclude>
     <ClInclude Include="Engine\3d\ModelManager.h">
-      <Filter>ソース ファイル\Engine\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\3d\Object3d.h">
-      <Filter>ソース ファイル\Engine\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\3d\Object3dCommon.h">
       <Filter>ソース ファイル\Engine\3d</Filter>
     </ClInclude>
     <ClInclude Include="Engine\base\D3DResorceLeakChecker.h">
@@ -268,18 +274,6 @@
     </ClInclude>
     <ClInclude Include="Engine\base\SrvManager.h">
       <Filter>ソース ファイル\Engine\base</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\3d\ParticleManager.h">
-      <Filter>ソース ファイル\Engine\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\3d\ParticleCommon.h">
-      <Filter>ソース ファイル\Engine\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\3d\Particle.h">
-      <Filter>ソース ファイル\Engine\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\3d\ParticleEmitter.h">
-      <Filter>ソース ファイル\Engine\3d</Filter>
     </ClInclude>
     <ClInclude Include="Engine\2d\ImGuiManager.h">
       <Filter>ソース ファイル\Engine\2d</Filter>
@@ -353,29 +347,47 @@
     <ClInclude Include="GameProgram\Player.h">
       <Filter>ソース ファイル\GameProgram</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\3d\GLTFCommon.h">
+    <ClInclude Include="Engine\3d\_gltf\GLTFCommon.h">
+      <Filter>ソース ファイル\Engine\3d\_gltf</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\3d\_gltf\Model_glTF.h">
+      <Filter>ソース ファイル\Engine\3d\_gltf</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\3d\_gltf\Object_glTF.h">
+      <Filter>ソース ファイル\Engine\3d\_gltf</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\3d\_obj\Model_obj.h">
+      <Filter>ソース ファイル\Engine\3d\_obj</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\3d\_obj\Object3d.h">
+      <Filter>ソース ファイル\Engine\3d\_obj</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\3d\_obj\Object3dCommon.h">
+      <Filter>ソース ファイル\Engine\3d\_obj</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\3d\_Particle\Particle.h">
+      <Filter>ソース ファイル\Engine\3d\_Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\3d\_Particle\ParticleCommon.h">
+      <Filter>ソース ファイル\Engine\3d\_Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\3d\_Particle\ParticleEmitter.h">
+      <Filter>ソース ファイル\Engine\3d\_Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\3d\_Particle\ParticleManager.h">
+      <Filter>ソース ファイル\Engine\3d\_Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\3d\Primitive\BoxModel.h">
+      <Filter>ソース ファイル\Engine\3d\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\3d\Primitive\SphereModel.h">
+      <Filter>ソース ファイル\Engine\3d\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\3d\DebugWireframes.h">
       <Filter>ソース ファイル\Engine\3d</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\3d\Model_glTF.h">
+    <ClInclude Include="Engine\3d\Cubemap.h">
       <Filter>ソース ファイル\Engine\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\3d\Model_obj.h">
-      <Filter>ソース ファイル\Engine\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\3d\Object_glTF.h">
-      <Filter>ソース ファイル\Engine\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="BoxModel.h">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Cubemap.h">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugWireframes.h">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="SphereModel.h">
-      <Filter>ソース ファイル\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
