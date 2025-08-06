@@ -4,11 +4,12 @@ using namespace MyMath;
 
 void GameScene::Initialize() {
 
-	ModelManager::GetInstance()->LoadModel("terrain");
-	ModelManager::GetInstance()->LoadModel("sphere");
-	ModelManager::GetInstance()->LoadModel("playerHead");
-	ModelManager::GetInstance()->LoadModel("enemy");
-	ModelManager::GetInstance()->LoadModel("stage_proto");
+	ModelManager::GetInstance()->LoadModel("terrain",".obj");
+	ModelManager::GetInstance()->LoadModel("sphere",".obj");
+	ModelManager::GetInstance()->LoadModel("playerHead", ".obj");
+	ModelManager::GetInstance()->LoadModel("enemy", ".obj");
+	ModelManager::GetInstance()->LoadModel("stage_proto", ".obj");
+	ModelManager::GetInstance()->LoadModel("sneakWalk", ".gltf");
 
 
 	camera = new Camera();
@@ -23,8 +24,10 @@ void GameScene::Initialize() {
 	camera->SetTranslate(cameraTranslate);
 
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera);
+	GLTFCommon::GetInstance()->SetDefaultCamera(camera);
 	ParticleCommon::GetInstance()->SetDefaultCamera(camera);
-
+	DebugWireframes::GetInstance()->SetDefaultCamera(camera);
+	Cubemap::GetInstance()->SetDefaultCamera(camera);
 
 	player_ = new Player();
 	player_->Initialize();
@@ -68,7 +71,7 @@ void GameScene::Initialize() {
 
 	stageobj = new Object3d();
 	stageobj->Initialize();
-	stageobj->SetModelFile("stage_proto");
+	stageobj->SetModelFile("stage_proto.obj");
 
 	wt.Initialize();
 
@@ -76,6 +79,14 @@ void GameScene::Initialize() {
 	soundData_ = Audio::GetInstance()->LoadWave("resource/sound/bane.wav");
 
 	Audio::GetInstance()->SoundPlayWave(BGMData_, 0.3f, true);
+
+	skyBox = new BoxModel();
+	skyBox->Initialize("resource/rostock_laage_airport_4k.dds");
+
+	gltfOBJ = new Object_glTF();
+	gltfOBJ->Initialize();
+	gltfOBJ->SetModelFile("sneakWalk.gltf");
+	gltfOBJ->SetEnvironment("resource/rostock_laage_airport_4k.dds");
 }
 
 void GameScene::Update() {
@@ -97,6 +108,7 @@ void GameScene::Update() {
 	//if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 	//	sceneNo = Title;
 	//}
+	skyBox->Update(wt.matWorld_ * MakeScaleMatrix({ 1000,1000,1000 }));//大きくするため
 
 	camera->Update();
 
@@ -139,9 +151,13 @@ void GameScene::Update() {
 			player_->IsGround(false);
 		}
 
-	}
+	}	
+	
+	gltfOBJ->Update(wt);
+
 	wt.UpdateMatrix();
 	worldTransformCamera_.UpdateMatrix();
+
 
 #ifdef  USE_IMGUI
 
@@ -170,6 +186,15 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw() {
+	
+	Cubemap::GetInstance()->Command();
+	skyBox->Draw();
+
+
+	//モデル描画処理
+	GLTFCommon::GetInstance()->Command();
+	
+	gltfOBJ->Draw();
 
 	//モデル描画処理
 	Object3dCommon::GetInstance()->Command();
@@ -197,4 +222,6 @@ void GameScene::Finalize() {
 		delete enemy;
 	}
 	delete stageobj;
+	delete skyBox;
+	delete gltfOBJ;
 }

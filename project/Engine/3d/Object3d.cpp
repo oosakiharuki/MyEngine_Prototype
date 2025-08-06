@@ -155,7 +155,7 @@ void Object3d::Draw(const WorldTransform& worldTransform, const std::string& tex
 }
 
 void Object3d::SetModelFile(const std::string& filePath) {
-	model = ModelManager::GetInstance()->FindModel(filePath);
+	model = ModelManager::GetInstance()->FindModel_obj(filePath);
 }
 
 void Object3d::LightSwitch(bool isLight) {

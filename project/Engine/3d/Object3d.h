@@ -1,6 +1,6 @@
 #pragma once
 #include "MyMath.h"
-#include "Model.h"
+#include "Model_obj.h"
 
 //ComPtr
 #include <wrl.h>
@@ -23,7 +23,7 @@ public:
 	//static MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 	//static ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 
-	void SetModel(Model* model) { this->model = model; }
+	void SetModel(Model_obj* model) { this->model = model; }
 	void SetModelFile(const std::string& filePath);
 	void LightSwitch(bool isLight);
 
@@ -65,6 +65,6 @@ private:
 
 	Transform transformL;
 
-	Model* model = nullptr;
+	Model_obj* model = nullptr;
 	Camera* camera = nullptr;
 };

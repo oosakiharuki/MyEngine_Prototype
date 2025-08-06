@@ -5,6 +5,7 @@
 
 #include "SpriteCommon.h"
 #include "Object3dCommon.h"
+#include "GLTFCommon.h"
 #include "ParticleCommon.h"
 
 #include "ModelManager.h"
@@ -18,8 +19,10 @@
 
 #include "Audio.h"
 
+#include"DebugWireframes.h"
+#include "Cubemap.h"
 
-class Framework{
+class Framework {
 public:
 	virtual void Initialize();
 	virtual void Update();
@@ -38,13 +41,15 @@ private:
 
 	SpriteCommon* spriteCommon = nullptr;
 	Object3dCommon* object3dCommon = nullptr;
+	GLTFCommon* glTFCommon = nullptr;
 	ModelCommon* modelCommon = nullptr;
 	ParticleCommon* particleCommon = nullptr;
-	//PostEffect* postEffect = nullptr;
-
-
+	
 	PostEffectManager* postEffectM = nullptr;
 	Audio* audio_;
+
+	DebugWireframes* debugWireframes = nullptr;
+	Cubemap* cubemap = nullptr;
 
 	bool isRequst = false;
 };

@@ -2,6 +2,7 @@
 
 #include "Sprite.h"
 #include "Object3d.h"
+#include "Object_glTF.h"
 #include "Particle.h" 
 #include "Audio.h"
 #include "MyMath.h"
@@ -11,6 +12,8 @@
 #include "Levelediter.h"
 #include "Player.h"
 #include "Enemy.h"
+
+#include "BoxModel.h"
 
 class GameScene : public IScene {
 public:
@@ -41,4 +44,8 @@ private:
 	SoundData soundData_;
 	SoundData BGMData_;
 	float volume = 0.3f;
+
+	BoxModel* skyBox = nullptr;
+
+	Object_glTF* gltfOBJ = nullptr;
 };

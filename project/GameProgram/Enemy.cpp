@@ -14,7 +14,7 @@ void Enemy::Initialize() {
 
 	object = new Object3d();
 	object->Initialize();
-	object->SetModelFile("enemy");
+	object->SetModelFile("enemy.obj");
 }
 
 void Enemy::Update() {

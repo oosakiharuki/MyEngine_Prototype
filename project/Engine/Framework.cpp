@@ -11,9 +11,6 @@ void Framework::Initialize() {
 	input_->Initialize(winApp_);
 
 
-	//ShowWindow(hwnd, SW_SHOW);
-
-
 	dxCommon = DirectXCommon::GetInstance();
 	dxCommon->SetWinApp(winApp_);
 	dxCommon->Initialize();
@@ -31,7 +28,9 @@ void Framework::Initialize() {
 
 	object3dCommon = Object3dCommon::GetInstance();
 	object3dCommon->Initialize(dxCommon);
-
+	
+	glTFCommon = GLTFCommon::GetInstance();
+	glTFCommon->Initialize(dxCommon);
 
 	modelCommon = new ModelCommon();
 	modelCommon->Initialize(dxCommon);
@@ -42,8 +41,11 @@ void Framework::Initialize() {
 	particleCommon->Initialize(dxCommon);
 	ParticleManager::GetInstance()->Initialize(dxCommon, srvManager);
 
-	//postEffect = PostEffect::GetInstance();
-	//postEffect->Initialize(dxCommon);
+	debugWireframes = DebugWireframes::GetInstance();
+	debugWireframes->Initialize(dxCommon);
+
+	cubemap = Cubemap::GetInstance();
+	cubemap->Initialize(dxCommon);
 
 	postEffectM = PostEffectManager::GetInstance();
 	postEffectM->Initialize(dxCommon);
@@ -78,18 +80,19 @@ void Framework::Finalize() {
 	ParticleManager::GetInstance()->Finalize();
 
 	dxCommon->Finalize();
-	//delete dxCommon;
-	//dxCommon = nullptr;
 
 	srvManager->Finalize();
 
 	spriteCommon->Finalize();	
 	object3dCommon->Finalize();
+	glTFCommon->Finalize();
 	delete modelCommon;
 	
 	particleCommon->Finalize();
 
-	//postEffect->Finalize();
+	debugWireframes->Finalize();
+	cubemap->Finalize();
+
 	postEffectM->Finalize();
 
 	audio_->Finalize();

@@ -15,7 +15,7 @@ void Player::Initialize() {
 
 	object = new Object3d();
 	object->Initialize();
-	object->SetModelFile("playerHead");
+	object->SetModelFile("playerHead.obj");
 }
 
 void Player::Update() {
