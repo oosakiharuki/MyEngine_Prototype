@@ -13,7 +13,7 @@ public:
 	
 	//texture用
 	void CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format, UINT MipLevels);
-	void CreateSRVforStructureBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride);
+	void CreateSRVforStructureBuffer(D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc,uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride);
 	void PreDraw();
 	void SetGraphicsRootDescriptorTable(UINT RootParameterIndex, uint32_t srvIndex);
 

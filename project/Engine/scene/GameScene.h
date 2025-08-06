@@ -2,13 +2,18 @@
 
 #include "Sprite.h"
 #include "Object3d.h"
-#include "particle.h" 
+#include "Object_glTF.h"
+#include "Particle.h" 
 #include "Audio.h"
 #include "MyMath.h"
 #include "Framework.h"
 #include "IScene.h"
 
-#include "TestClass.h"
+#include "Levelediter.h"
+#include "Player.h"
+#include "Enemy.h"
+
+#include "BoxModel.h"
 
 class GameScene : public IScene {
 public:
@@ -17,38 +22,30 @@ public:
 	void Draw() override;
 	void Finalize() override;
 private:
-
+	
+	XINPUT_STATE state,preState;
 
 	Camera* camera = nullptr;
 	Vector3 cameraRotate = { 0.0f,0.0f,0.0f };
 	Vector3 cameraTranslate = { 0.0f,0.0f,-15.0f };
+	WorldTransform worldTransformCamera_;
 
-	//std::vector<Sprite*> sprites;
-	//std::vector<Object3d*> objects;
-	Sprite* spriteUI;
-	Vector2 position = { 0,0 };
+	Levelediter levelediter;
+	Player* player_ = nullptr;
+	std::vector<Enemy*> enemies;
 
-	//Particle* particle = nullptr;
-	//Particle* particle2 = nullptr;
+	Object3d* stageobj;
+	WorldTransform wt;
 
-	//Audio* audio2 = nullptr;
-	//int audioHandle2 = 0;
+	//ステージの足場
+	std::vector<AABB> stagesAABB;
 
+	//テスト音源
+	SoundData soundData_;
+	SoundData BGMData_;
+	float volume = 0.3f;
 
-	////描画させるもの
-	//bool IsSphere = true;
-	//bool IsModel[2] = { true,true };
-	//bool IsSprite = true;
+	BoxModel* skyBox = nullptr;
 
-
-	//ゲームループ終了(while文から抜ける)
-	bool isRequst = false;
-
-	XINPUT_STATE state,preState;
-
-	//WorldTransform worldTransform;
-	//WorldTransform worldTransform2;
-
-
-	TestClass* testClass = nullptr;
+	Object_glTF* gltfOBJ = nullptr;
 };
