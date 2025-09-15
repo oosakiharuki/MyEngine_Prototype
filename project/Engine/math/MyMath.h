@@ -112,6 +112,16 @@ struct ModelData {
 	MaterialData material;
 };
 
+struct ModelDataMulti {
+
+	//std::vector<ModelData> Data;
+
+
+	std::vector<std::vector<VertexData>> vertices;
+	std::vector<MaterialData> material;
+};
+
+
 struct ModelData_glTF {
 	std::map<std::string, JointWeightData> skinClusterDeta;
 	std::vector<VertexData> vertices;

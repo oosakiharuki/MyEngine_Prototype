@@ -1,5 +1,6 @@
 #pragma once
 #include "Sprite.h"
+#include "Object3d.h"
 #include "Framework.h"
 #include "IScene.h"
 
@@ -11,4 +12,7 @@ public:
 	void Finalize() override;
 private:
 	Sprite* sprite;
+	Object3d* twoMesh;
+	WorldTransform wt;
+	Camera* camera;
 };
