@@ -172,7 +172,7 @@ void GLTFCommon::GraphicsPipeline() {
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	//shaderのコンパイラ
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = dxCommon_->CompileShader(L"resource/shaders/SkinningObject3d.VS.hlsl", L"vs_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = dxCommon_->CompileShader(L"resource/shaders/Object3d.VS.hlsl", L"vs_6_0");
 	assert(vertexShaderBlob != nullptr);
 
 	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = dxCommon_->CompileShader(L"resource/shaders/Object3d_glTF.PS.hlsl", L"ps_6_0");

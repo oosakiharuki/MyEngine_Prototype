@@ -124,9 +124,9 @@ struct ModelDataMulti {
 
 struct ModelData_glTF {
 	std::map<std::string, JointWeightData> skinClusterDeta;
-	std::vector<VertexData> vertices;
-	std::vector<uint32_t> indices;
-	MaterialData material;
+	std::vector<std::vector<VertexData>> vertices;
+	std::vector<std::vector<uint32_t>> indices;
+	std::vector<MaterialData> material;
 	Node rootNode;
 };
 

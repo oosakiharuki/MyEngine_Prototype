@@ -11,12 +11,19 @@ void TitleScene::Initialize() {
 	camera->SetTranslate({0,0,-30});
 
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera);
+	GLTFCommon::GetInstance()->SetDefaultCamera(camera);
 
 	ModelManager::GetInstance()->LoadModel("TwoMesh", ".obj");
+	ModelManager::GetInstance()->LoadModel("TwoMesh", ".gltf");
 
-	twoMesh = new Object3d();
+	twoMesh = new Object_glTF();
 	twoMesh->Initialize();
-	twoMesh->SetModelFile("TwoMesh.obj");
+	twoMesh->SetModelFile("TwoMesh.gltf");
+
+	TextureManager::GetInstance()->LoadTexture("resource/rostock_laage_airport_4k.dds");
+
+	twoMesh->SetEnvironment("resource/rostock_laage_airport_4k.dds");
+
 
 	wt.Initialize();
 }
@@ -25,10 +32,10 @@ void TitleScene::Update() {
 	sprite->Update();
 
 	camera->Update();
-	twoMesh->Update();
+	twoMesh->Update(wt);
 
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		sceneNo = Game;
+		//sceneNo = Game;
 	}
 
 	wt.UpdateMatrix();
@@ -40,7 +47,9 @@ void TitleScene::Draw() {
 	sprite->Draw();
 
 	Object3dCommon::GetInstance()->Command();
-	twoMesh->Draw(wt);
+
+	GLTFCommon::GetInstance()->Command();
+	twoMesh->Draw();
 }
 
 void TitleScene::Finalize() {

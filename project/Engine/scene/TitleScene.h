@@ -1,6 +1,7 @@
 #pragma once
 #include "Sprite.h"
 #include "Object3d.h"
+#include "Object_glTF.h"
 #include "Framework.h"
 #include "IScene.h"
 
@@ -12,7 +13,7 @@ public:
 	void Finalize() override;
 private:
 	Sprite* sprite;
-	Object3d* twoMesh;
+	Object_glTF* twoMesh;
 	WorldTransform wt;
 	Camera* camera;
 };

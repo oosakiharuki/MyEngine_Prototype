@@ -14,31 +14,51 @@ void Model_glTF::Initialize(ModelCommon* modelCommon, const std::string& directo
 
 	//.gltf
 	modelData = LoadModelFile(directorypath, fileName);
-	animation = LoadAnimationFile(directorypath, fileName);
+	//animation = LoadAnimationFile(directorypath, fileName);
 
 	InitialData = modelData;
 
 	//vertex
-	vertexResource = modelCommon->GetDxCommon()->CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
+	for (auto& vertices : modelData.vertices) {
+		D3D12_VERTEX_BUFFER_VIEW vertexB;
+		Microsoft::WRL::ComPtr<ID3D12Resource> vertexR;
 
-	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
-	vertexBufferView.StrideInBytes = sizeof(VertexData);
+		vertexR = modelCommon->GetDxCommon()->CreateBufferResource(sizeof(VertexData) * vertices.size());
 
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
+		vertexB.BufferLocation = vertexR->GetGPUVirtualAddress();
+		vertexB.SizeInBytes = UINT(sizeof(VertexData) * vertices.size());
+		vertexB.StrideInBytes = sizeof(VertexData);
+
+		vertexR->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+		std::memcpy(vertexData, vertices.data(), sizeof(VertexData) * vertices.size());
+
+		vertexResource.push_back(vertexR);
+		vertexBufferView.push_back(vertexB);
+
+	}
 
 	//index
-	indexResource = modelCommon->GetDxCommon()->CreateBufferResource(sizeof(uint32_t) * modelData.indices.size());
+	uint32_t count = 0;
 
-	indexBufferView.BufferLocation = indexResource->GetGPUVirtualAddress();
-	indexBufferView.SizeInBytes = UINT(sizeof(uint32_t) * modelData.indices.size());
-	indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+	for (auto& indices : modelData.indices) {
+		D3D12_INDEX_BUFFER_VIEW indexB;
+		Microsoft::WRL::ComPtr<ID3D12Resource> indexR;
+
+		indexR = modelCommon->GetDxCommon()->CreateBufferResource(sizeof(uint32_t) * indices.size());
+
+		indexB.BufferLocation = indexR->GetGPUVirtualAddress();
+		indexB.SizeInBytes = UINT(sizeof(uint32_t) * indices.size());
+		indexB.Format= DXGI_FORMAT_R32_UINT;
 
 
-	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedIndex));
-	std::memcpy(mappedIndex, modelData.indices.data(), sizeof(uint32_t) * modelData.indices.size());
+		indexR->Map(0, nullptr, reinterpret_cast<void**>(&mappedIndex));
+		std::memcpy(mappedIndex, indices.data(), sizeof(uint32_t) * indices.size());
 
+		indexBufferView.push_back(indexB);
+		indexResource.push_back(indexR);
+
+
+	}
 
 	//Model用マテリアル
 	//マテリアル用のリソース
@@ -50,16 +70,17 @@ void Model_glTF::Initialize(ModelCommon* modelCommon, const std::string& directo
 	materialData->enableLighting = true;
 	materialData->uvTransform = MakeIdentity4x4();
 	materialData->shininess = 70;
-	materialData->environmentCoefficient = 0.3f;
+	materialData->environmentCoefficient = 0.0f;
 
 	//テクスチャ読み込み
-	TextureManager::GetInstance()->LoadTexture(modelData.material.textureFilePath);
-	modelData.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(modelData.material.textureFilePath);
+	for (auto& material : modelData.material) {
+		TextureManager::GetInstance()->LoadTexture(material.textureFilePath);
+		material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(material.textureFilePath);
+	}
 
 	skeleton = CreateSkeltion(modelData.rootNode);
 	skinCluster = CreateSkinCluster(skeleton,modelData);
-
-	vbvs[0] = vertexBufferView;
+	
 	vbvs[1] = skinCluster.influenceBufferView;
 
 }
@@ -68,127 +89,24 @@ void Model_glTF::Draw() {
 	//objファイルに元々あったテクスチャ
 	modelData = InitialData;
 	
-	modelCommon->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 2, vbvs);
-	//modelCommon->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
-	modelCommon->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&indexBufferView);
-	modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
-	modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData.material.textureFilePath));
-	modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(7, skinCluster.paletteSrvHandle.second);//Skinning.VS t0
-	
-	modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(8, TextureManager::GetInstance()->GetSrvHandleGPU(EnvironmentFile));
-	//modelCommon->GetDxCommon()->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
-	modelCommon->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(UINT(modelData.indices.size()), 1, 0, 0, 0);
+	uint32_t i = 0;
+	for (auto& indices : modelData.indices) {
+		vbvs[0] = vertexBufferView[i];
 
-}
+		modelCommon->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 2, vbvs);
+		//modelCommon->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
+		modelCommon->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&indexBufferView[i]);
+		modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
+		modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData.material[i].textureFilePath));
+		modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(7, skinCluster.paletteSrvHandle.second);//Skinning.VS t0
 
-void Model_glTF::Draw(const std::string& textureFilePath) {
-
-	TextureManager::GetInstance()->LoadTexture(textureFilePath);
-	modelData.material.textureFilePath = textureFilePath;
-	modelData.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureFilePath);
-	
-	modelCommon->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 2, vbvs);
-	//modelCommon->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
-	modelCommon->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&indexBufferView);
-	modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
-	modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData.material.textureFilePath));
-	modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(7, skinCluster.paletteSrvHandle.second);//Skinning.VS t0
-	//modelCommon->GetDxCommon()->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
-	modelCommon->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(UINT(modelData.indices.size()), 1, 0, 0, 0);
-
-}
-
-
-MaterialData Model_glTF::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
-	MaterialData materialData;
-	std::string line;
-	std::ifstream file(directoryPath + "/" + filename);
-	assert(file.is_open());
-
-	//ファイルを開く
-	while (std::getline(file, line)) {
-		std::string identifier;
-		std::istringstream s(line);
-		s >> identifier;
-
-		if (identifier == "map_Kd") {
-			std::string textureFilename;
-			s >> textureFilename;
-
-			materialData.textureFilePath = directoryPath + "/Sprite/" + textureFilename;
-		}
+		modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(8, TextureManager::GetInstance()->GetSrvHandleGPU(EnvironmentFile));
+		//modelCommon->GetDxCommon()->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+		modelCommon->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(UINT(indices.size()), 1, 0, 0, 0);
+		i++;
 	}
-	return materialData;
-};
+}
 
-
-//ModelData Model_glTF::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
-//	ModelData modelData;
-//
-//	Assimp::Importer importer;
-//	std::string filePath = directoryPath + "/" + filename;
-//
-//	const aiScene* scene = importer.ReadFile(filePath.c_str(),aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
-//	assert(scene->HasMeshes()); //メッシュがないのは対応なし
-//
-//	//VertexDataを読み取る
-//	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
-//		aiMesh* mesh = scene->mMeshes[meshIndex];
-//		assert(mesh->HasNormals());//法線があるか
-//		assert(mesh->HasTextureCoords(0));//Texcordがあるか
-//
-//		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
-//			aiFace& face = mesh->mFaces[faceIndex];
-//			assert(face.mNumIndices == 3);//三角形のみ
-//			
-//			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
-//				uint32_t vertexIndex = face.mIndices[element];
-//				aiVector3D& position = mesh->mVertices[vertexIndex];
-//				aiVector3D& normal = mesh->mNormals[vertexIndex];
-//				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
-//
-//				VertexData vertex;
-//				vertex.position = { position.x,position.y,position.z,1.0f };
-//				vertex.normal = { normal.x,normal.y, normal.z, };
-//				vertex.texcoord = { texcoord.x,texcoord.y };
-//
-//				//aiProcess_MakeleftHandleなので z *= -1,右手→左手(x *= -1)に変換する
-//				vertex.position.x *= -1.0f;
-//				vertex.normal.x *= -1.0f;
-//
-//				modelData.vertices.push_back(vertex);
-//			}
-//		}
-//
-//		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
-//			aiFace& face = mesh->mFaces[faceIndex];
-//			assert(face.mNumIndices == 3);//三角形のみ
-//
-//			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
-//				uint32_t vertexIndex = face.mIndices[element];
-//				modelData.indices.push_back(vertexIndex);
-//			}
-//		}
-//
-//
-//	}	
-//	//MaterialData
-//	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
-//		aiMaterial* material = scene->mMaterials[materialIndex];
-//		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
-//			aiString textureFilePath;
-//			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
-//			modelData.material.textureFilePath = directoryPath + "/Sprite/" + textureFilePath.C_Str();		
-//		}
-//
-//	}	
-//	//オブジェクトには親子ノードがないので単品
-//	Node result;
-//	result.localMatrix = MakeIdentity4x4();
-//	modelData.rootNode = result;
-//
-//	return modelData;
-//}
 
 ModelData_glTF Model_glTF::LoadModelFile(const std::string& directoryPath, const std::string& filename) {
 	ModelData_glTF modelData;
@@ -199,22 +117,31 @@ ModelData_glTF Model_glTF::LoadModelFile(const std::string& directoryPath, const
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
 	assert(scene->HasMeshes()); //メッシュがないのは対応なし
 
+	std::vector<VertexData> vertices;
+
 	//VertexDataを読み取る
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 		assert(mesh->HasNormals());//法線があるか
 		assert(mesh->HasTextureCoords(0));//Texcordがあるか
-		modelData.vertices.resize(mesh->mNumVertices);//頂点数分のメモリ確保
+		//modelData.vertices.resize(mesh->mNumVertices);//頂点数分のメモリ確保
+
+		vertices.resize(mesh->mNumVertices);//頂点数分のメモリ確保
 
 		for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
 			aiVector3D& position = mesh->mVertices[vertexIndex];
 			aiVector3D& normal = mesh->mNormals[vertexIndex];
 			aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
 
-			modelData.vertices[vertexIndex].position = { -position.x,position.y,position.z,1.0f };
-			modelData.vertices[vertexIndex].normal = { -normal.x,normal.y, normal.z, };
-			modelData.vertices[vertexIndex].texcoord = { texcoord.x,texcoord.y };
+			vertices[vertexIndex].position = { -position.x,position.y,position.z,1.0f };
+			vertices[vertexIndex].normal = { -normal.x,normal.y, normal.z, };
+			vertices[vertexIndex].texcoord = { texcoord.x,texcoord.y };
 		}
+
+		modelData.vertices.push_back(vertices);
+
+
+		std::vector<uint32_t> indices;
 
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
 			aiFace& face = mesh->mFaces[faceIndex];
@@ -222,9 +149,11 @@ ModelData_glTF Model_glTF::LoadModelFile(const std::string& directoryPath, const
 
 			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
 				uint32_t vertexIndex = face.mIndices[element];
-				modelData.indices.push_back(vertexIndex);
+				indices.push_back(vertexIndex);
 			}
 		}
+
+		modelData.indices.push_back(indices);
 
 		for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
 			
@@ -250,14 +179,16 @@ ModelData_glTF Model_glTF::LoadModelFile(const std::string& directoryPath, const
 		}
 	}
 
-	modelData.material.textureFilePath = directoryPath + "/Sprite/uvChecker.png";
 	//MaterialData
 	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
 		aiMaterial* material = scene->mMaterials[materialIndex];
 		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
 			aiString textureFilePath;
 			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
-			modelData.material.textureFilePath = directoryPath + "/Sprite/" + textureFilePath.C_Str();
+			
+			MaterialData materialData;
+			materialData.textureFilePath = directoryPath + "/Sprite/" + textureFilePath.C_Str();
+			modelData.material.push_back(materialData);
 		}
 
 	}

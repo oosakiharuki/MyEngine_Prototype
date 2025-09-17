@@ -146,7 +146,7 @@ void Object_glTF::Draw() {
 	DebugWireframes::GetInstance()->Command();
 
 	for (auto it : debugSphere) {
-		it->Draw();
+		//it->Draw();
 	}
 
 	GLTFCommon::GetInstance()->Command();
@@ -155,25 +155,7 @@ void Object_glTF::Draw() {
 }
 
 void Object_glTF::Draw(const std::string& textureData) {
-	//モデル
-	object3dCommon->GetDirectXCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-	object3dCommon->GetDirectXCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightSphereResource->GetGPUVirtualAddress());
-	object3dCommon->GetDirectXCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
-	object3dCommon->GetDirectXCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
-	object3dCommon->GetDirectXCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
-	if (model) {
-		model->Draw(textureData);
-	}
-
-#ifdef _DEBUG
-	DebugWireframes::GetInstance()->Command();
-
-	for (auto it : debugSphere) {
-		it->Draw();
-	}
-
-	GLTFCommon::GetInstance()->Command();
-#endif // _DEBUG
+	//モデル 
 
 }
 
