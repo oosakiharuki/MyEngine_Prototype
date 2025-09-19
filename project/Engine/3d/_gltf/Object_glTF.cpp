@@ -23,12 +23,12 @@ Object_glTF::~Object_glTF(){
 void Object_glTF::Initialize() {
 	this->object3dCommon = GLTFCommon::GetInstance();
 	this->camera = object3dCommon->GetDefaultCamera();
-	wvpResource = object3dCommon->GetDirectXCommon()->CreateBufferResource(sizeof(TransformationMatrix));
-	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+	//wvpResource = object3dCommon->GetDirectXCommon()->CreateBufferResource(sizeof(TransformationMatrix));
+	//wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
 
 
-	wvpData->World = MakeIdentity4x4();
-	wvpData->WVP = MakeIdentity4x4();
+	//wvpData->World = MakeIdentity4x4();
+	//wvpData->WVP = MakeIdentity4x4();
 
 	//ライト用のリソース
 	directionalLightSphereResource = object3dCommon->GetDirectXCommon()->CreateBufferResource(sizeof(DirectionalLight));
@@ -125,13 +125,25 @@ void Object_glTF::Update(const WorldTransform& worldTransform) {
 	if (!model->IsSkinning()) {
 		for (uint32_t i = 0; i < modelData.indices.size(); i++) {
 			Matrix4x4 localMatrix;
-			NodeAnimation& rootNodeAnimation = animation[i].nodeAnimations[modelData.rootNode.children[i].name];
-			Vector3 translate = CalculateValue(rootNodeAnimation.translate, animationTime);//nextと逆にする()
-			Quaternion rotate = CalculateValueQuaternion(rootNodeAnimation.rotate, animationTime);
-			Vector3 scale = CalculateValue(rootNodeAnimation.scale, animationTime);
 
-			localMatrix = MakeAffineMatrix(scale, rotate, translate);
-			localMatrices.push_back(localMatrix);
+			if (modelData.indices.size() <= 1) {
+				NodeAnimation& rootNodeAnimation = animation[i].nodeAnimations[modelData.rootNode.name];
+				Vector3 translate = CalculateValue(rootNodeAnimation.translate, animationTime);//nextと逆にする()
+				Quaternion rotate = CalculateValueQuaternion(rootNodeAnimation.rotate, animationTime);
+				Vector3 scale = CalculateValue(rootNodeAnimation.scale, animationTime);
+
+				localMatrix = MakeAffineMatrix(scale, rotate, translate);
+				localMatrices.push_back(localMatrix);
+			}
+			else {
+				NodeAnimation& rootNodeAnimation = animation[i].nodeAnimations[modelData.rootNode.children[i].name];
+				Vector3 translate = CalculateValue(rootNodeAnimation.translate, animationTime);//nextと逆にする()
+				Quaternion rotate = CalculateValueQuaternion(rootNodeAnimation.rotate, animationTime);
+				Vector3 scale = CalculateValue(rootNodeAnimation.scale, animationTime);
+
+				localMatrix = MakeAffineMatrix(scale, rotate, translate);
+				localMatrices.push_back(localMatrix);
+			}
 		}
 	}
 
@@ -144,7 +156,7 @@ void Object_glTF::Update(const WorldTransform& worldTransform) {
 
 		//通常のアニメーション
 		if (!model->IsSkinning()) {
-			WorldViewProjectionMatrix = localMatrices[0] * localMatrices[1] * localMatrices[2] * worldTransform.matWorld_ * projectionMatrix;
+			WorldViewProjectionMatrix = worldTransform.matWorld_ * projectionMatrix;
 		}
 	}
 	else {
@@ -152,10 +164,17 @@ void Object_glTF::Update(const WorldTransform& worldTransform) {
 	}
 	Matrix4x4 JointWorldMatrix = skaletonSpaceMatrix * worldTransform.matWorld_;
 
-	wvpData->World = JointWorldMatrix * worldTransform.matWorld_;
-	wvpData->World = modelData.rootNode.localMatrix * worldTransform.matWorld_;
-	//wvpData->World = worldMatrix;
-	wvpData->WVP = WorldViewProjectionMatrix;
+	for (uint32_t i = 0; i < modelData.indices.size(); i++) {
+
+		wvpDatas[i]->World = modelData.rootNode.localMatrix * worldTransform.matWorld_;
+		if (model->IsSkinning()) {
+			wvpDatas[i]->WVP = WorldViewProjectionMatrix;
+		}
+		else {
+			wvpDatas[i]->WVP = localMatrices[i] * WorldViewProjectionMatrix;
+		}
+
+	}
 
 	directionalLightSphereData->direction = Normalize(directionalLightSphereData->direction);
 }
@@ -163,14 +182,17 @@ void Object_glTF::Update(const WorldTransform& worldTransform) {
 
 void Object_glTF::Draw() {
 	//モデル
-	object3dCommon->GetDirectXCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-	object3dCommon->GetDirectXCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightSphereResource->GetGPUVirtualAddress());
-	object3dCommon->GetDirectXCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
-	object3dCommon->GetDirectXCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
-	object3dCommon->GetDirectXCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
-	if (model) {
-		model->Draw();
+	for (uint32_t i = 0; i < modelData.indices.size();i++) {
+		object3dCommon->GetDirectXCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResources[i]->GetGPUVirtualAddress());
+		object3dCommon->GetDirectXCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightSphereResource->GetGPUVirtualAddress());
+		object3dCommon->GetDirectXCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
+		object3dCommon->GetDirectXCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
+		object3dCommon->GetDirectXCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
+		if (model) {
+			model->Draw();
+		}
 	}
+	model->ResetI();
 
 #ifdef _DEBUG
 	DebugWireframes::GetInstance()->Command();
@@ -194,6 +216,23 @@ void Object_glTF::SetModelFile(const std::string& filePath) {
 	model = ModelManager::GetInstance()->FindModel_gltf(filePath);
 	material = model->GetMaterial();
 	modelData = model->GetModelData();
+
+
+	for (auto& i : modelData.indices) {
+		Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource;
+		TransformationMatrix* wvpData;
+		wvpResource = object3dCommon->GetDirectXCommon()->CreateBufferResource(sizeof(TransformationMatrix));
+		wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+
+
+		wvpData->World = MakeIdentity4x4();
+		wvpData->WVP = MakeIdentity4x4();
+
+		wvpResources.push_back(wvpResource);
+		wvpDatas.push_back(wvpData);
+	}
+
+
 	if (model->IsAnimation()) {
 		animation = model->GetAnimationData();
 		if (model->IsSkinning()) {

@@ -33,6 +33,8 @@ public:
 	bool IsSkinning() { return isSkinning_; }
 	bool IsAnimation() { return isAnimation_; }
 
+	void ResetI() { i = 0; }
+
 private:
 	ModelCommon* modelCommon = nullptr;
 
@@ -65,4 +67,7 @@ private:
 
 	bool isAnimation_ = false;
 	bool isSkinning_ = false;
+
+	uint32_t i = 0;
+
 };

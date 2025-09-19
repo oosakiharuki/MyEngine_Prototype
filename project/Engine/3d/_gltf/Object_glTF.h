@@ -55,8 +55,8 @@ public:
 private:
 	GLTFCommon* object3dCommon = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource;
-	TransformationMatrix* wvpData = nullptr;
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> wvpResources;
+	std::vector<TransformationMatrix*> wvpDatas;
 
 	//ライト用のリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightSphereResource;

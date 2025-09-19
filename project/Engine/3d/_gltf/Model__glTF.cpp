@@ -100,29 +100,25 @@ void Model_glTF::Initialize(ModelCommon* modelCommon, const std::string& directo
 void Model_glTF::Draw() {
 	//objファイルに元々あったテクスチャ
 	modelData = InitialData;
-	
-	uint32_t i = 0;
-	for (auto& indices : modelData.indices) {
-		vbvs[0] = vertexBufferView[i];
+	vbvs[0] = vertexBufferView[i];
 
-		if (isSkinning_) {	
-			vbvs[1] = skinClusters[i].influenceBufferView;
-			modelCommon->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 2, vbvs);
-			modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(8, skinClusters[i].paletteSrvHandle.second);//Skinning.VS t0
-		}
-		else {
-			modelCommon->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, vbvs);
-		}
-		//modelCommon->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
-		modelCommon->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&indexBufferView[i]);
-		modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
-		modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData.material[i].textureFilePath));
-		modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(7, TextureManager::GetInstance()->GetSrvHandleGPU(EnvironmentFile));
-
-		//modelCommon->GetDxCommon()->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
-		modelCommon->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(UINT(indices.size()), 1, 0, 0, 0);
-		i++;
+	if (isSkinning_) {
+		vbvs[1] = skinClusters[i].influenceBufferView;
+		modelCommon->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 2, vbvs);
+		modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(8, skinClusters[i].paletteSrvHandle.second);//Skinning.VS t0
 	}
+	else {
+		modelCommon->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, vbvs);
+	}
+	//modelCommon->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
+	modelCommon->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&indexBufferView[i]);
+	modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
+	modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData.material[i].textureFilePath));
+	modelCommon->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(7, TextureManager::GetInstance()->GetSrvHandleGPU(EnvironmentFile));
+
+	//modelCommon->GetDxCommon()->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+	modelCommon->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(UINT(modelData.indices[i].size()), 1, 0, 0, 0);
+	i++;
 }
 
 
