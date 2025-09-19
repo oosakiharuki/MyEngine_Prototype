@@ -89,33 +89,63 @@ void Object_glTF::Initialize() {
 void Object_glTF::Update(const WorldTransform& worldTransform) {
 
 	//作るときはフレームレートを60FPSにする
-	animationTime += 1.0f / 60.0f;
-	animationTime = std::fmod(animationTime, animation.duration);
+	uint32_t i = 0;
+	for (auto& animation_ : animation) {
+		animationTime += 1.0f / 60.0f;
+		animationTime = std::fmod(animationTime, animation_.duration);
+
+		//スキニング処理
+		if (model->IsSkinning()) {
+			if (isChange) {
+				changeTime += 1.0f / 60.0f;
+				if (changeTime >= preAnimation[i].duration) {
+					isChange = false;
+					changeTime = 0;
+				}
+				else {
+					Interpolation(skeletons[i], preAnimation[i], animation_, changeTime);
+				}
+			}
+			else {
+				ApplyAnimation(skeletons[1], animation_, animationTime);
+			}
+		}
+	}
 	
-	if (isChange) {
-		changeTime += 1.0f / 60.0f;
-		if (changeTime >= preAnimation.duration) {
-			isChange = false;
-			changeTime = 0;
-		}
-		else {	
-			Interpolation(skeleton, preAnimation, animation, changeTime);
+	//スキニング
+	if (model->IsSkinning()) {
+		for (auto& skeleton : skeletons) {
+			SkeletonUpdate(skeleton, worldTransform.matWorld_ * MakeTranslateMatrix(Vector3(0, 0, -0.2f)));
+			SkinClusterUpdate(skinClusters[i], skeleton);
 		}
 	}
-	else {
-		ApplyAnimation(skeleton, animation, animationTime);
+
+	std::vector<Matrix4x4> localMatrices;
+
+	if (!model->IsSkinning()) {
+		for (uint32_t i = 0; i < modelData.indices.size(); i++) {
+			Matrix4x4 localMatrix;
+			NodeAnimation& rootNodeAnimation = animation[i].nodeAnimations[modelData.rootNode.children[i].name];
+			Vector3 translate = CalculateValue(rootNodeAnimation.translate, animationTime);//nextと逆にする()
+			Quaternion rotate = CalculateValueQuaternion(rootNodeAnimation.rotate, animationTime);
+			Vector3 scale = CalculateValue(rootNodeAnimation.scale, animationTime);
+
+			localMatrix = MakeAffineMatrix(scale, rotate, translate);
+			localMatrices.push_back(localMatrix);
+		}
 	}
-
-	SkeletonUpdate(skeleton,worldTransform.matWorld_ * MakeTranslateMatrix(Vector3(0,0,-0.2f)));
-	SkinClusterUpdate(skinCluster, skeleton);
-
-
 
 	Matrix4x4 skaletonSpaceMatrix;
-	Matrix4x4 WorldViewProjectionMatrix;
+	Matrix4x4 WorldViewProjectionMatrix{};
+
 	if (camera) {
 		Matrix4x4 projectionMatrix = camera->GetViewProjectionMatrix();
-		WorldViewProjectionMatrix = worldTransform.matWorld_ * projectionMatrix;
+		WorldViewProjectionMatrix = worldTransform.matWorld_ * modelData.rootNode.localMatrix * projectionMatrix;
+
+		//通常のアニメーション
+		if (!model->IsSkinning()) {
+			WorldViewProjectionMatrix = localMatrices[0] * localMatrices[1] * localMatrices[2] * worldTransform.matWorld_ * projectionMatrix;
+		}
 	}
 	else {
 		WorldViewProjectionMatrix = worldTransform.matWorld_;
@@ -164,24 +194,36 @@ void Object_glTF::SetModelFile(const std::string& filePath) {
 	model = ModelManager::GetInstance()->FindModel_gltf(filePath);
 	material = model->GetMaterial();
 	modelData = model->GetModelData();
-	animation = model->GetAnimationData();
-	skeleton = model->GetSkeleton();
-	skinCluster = model->GetSkinCluster();
+	if (model->IsAnimation()) {
+		animation = model->GetAnimationData();
+		if (model->IsSkinning()) {
+			skeletons = model->GetSkeleton();
+			skinClusters = model->GetSkinCluster();
 
-	//デバッグワイヤーフレーム
-	//親ノード
-	//SetWireframe();
-	//子ノード
+			for (auto& skeleton : skeletons) {
+				SkeletonUpdate(skeleton);
+			}
+
+			//デバッグワイヤーフレーム
 #ifdef _DEBUG
-	for (uint32_t childIndex = 0; childIndex < skeleton.joints.size(); ++childIndex) {
-		SetWireframe();
+			for (uint32_t i = 0; i < skeletons.size(); i++) {
+				for (uint32_t childIndex = 0; childIndex < skeletons[i].joints.size(); ++childIndex) {
+					SetWireframe();
+				}
+			}
+
+#endif // _DEBUG	
+
+			int i = 0;
+
+			for (auto& skinCluster : skinClusters) {
+				SkinClusterUpdate(skinCluster, skeletons[i]);
+				i++;
+			}
+		}
 	}
-
-#endif // _DEBUG
-	SkeletonUpdate(skeleton);
-	SkinClusterUpdate(skinCluster,skeleton);
-
 }
+
 
 void Object_glTF::LightSwitch(bool isLight) {
 	if (model) {
@@ -278,19 +320,22 @@ void Object_glTF::ChangeAnimation(const std::string& filePath) {
 	model = ModelManager::GetInstance()->FindModel_gltf(filePath);
 	modelData = model->GetModelData();
 	animation = model->GetAnimationData();
-	skeleton = model->GetSkeleton();
-	skinCluster = model->GetSkinCluster();
+	skeletons = model->GetSkeleton();
+	skinClusters = model->GetSkinCluster();
 
 	//animationTimeを1.0f/60.0fに
 	//Sleapなどで0より小さい値を出さないようにする
 	//はじめは少しカクつくが、アニメーション補間が終えた後がスムーズ
 	changeTime += 1.0f / 60.0f;
 	animationTime = changeTime;
-
-	Interpolation(skeleton, animation, preAnimation,changeTime);
-	SkeletonUpdate(skeleton);
-	SkinClusterUpdate(skinCluster, skeleton);
-	
+	uint32_t i = 0;
+	for (auto& skeleton : skeletons) {
+		Interpolation(skeleton, animation[i], preAnimation[i], changeTime);
+		SkeletonUpdate(skeleton);
+		for (auto& skinCluster : skinClusters) {
+			SkinClusterUpdate(skinCluster, skeleton);
+		}
+	}
 	//アニメーション補間中に変更があった時
 	if (isChange) {
 		changeTime = 0.9f - changeTime;
@@ -299,10 +344,11 @@ void Object_glTF::ChangeAnimation(const std::string& filePath) {
 	isChange = true;
 
 	//Sleapなどで1より大きい値を出さないようにする
-	if (preAnimation.duration > 1.0f) {
-		preAnimation.duration = 0.9f;
+	for (auto& preAnimation_ : preAnimation) {
+		if (preAnimation_.duration > 1.0f) {
+			preAnimation_.duration = 0.9f;
+		}
 	}
-
 }
 
 void Object_glTF::Interpolation(Skeleton& skeleton, const Animation& animation, const Animation& nextAnimation, float animationTime) {

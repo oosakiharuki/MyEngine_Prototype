@@ -6,6 +6,7 @@
 #include "SpriteCommon.h"
 #include "Object3dCommon.h"
 #include "GLTFCommon.h"
+#include "SkinningCommon.h"
 #include "ParticleCommon.h"
 
 #include "ModelManager.h"
@@ -29,6 +30,7 @@ public:
 	virtual void Draw() = 0;
 	virtual void Finalize();
 	virtual bool IsEndRequst() { return isRequst; }
+	virtual void SetIsEndRequst(bool result) { isRequst = result; }
 
 	virtual ~Framework() = default;
 
@@ -42,9 +44,10 @@ private:
 	SpriteCommon* spriteCommon = nullptr;
 	Object3dCommon* object3dCommon = nullptr;
 	GLTFCommon* glTFCommon = nullptr;
+	SkinningCommon* skinningCommon = nullptr;
 	ModelCommon* modelCommon = nullptr;
 	ParticleCommon* particleCommon = nullptr;
-	
+
 	PostEffectManager* postEffectM = nullptr;
 	Audio* audio_;
 

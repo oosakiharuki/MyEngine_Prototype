@@ -24,13 +24,16 @@ void Framework::Initialize() {
 	spriteCommon = SpriteCommon::GetInstance();
 	spriteCommon->Initialize(dxCommon);
 	TextureManager::GetInstance()->Initialize(dxCommon, srvManager);
-	
+
 
 	object3dCommon = Object3dCommon::GetInstance();
 	object3dCommon->Initialize(dxCommon);
-	
+
 	glTFCommon = GLTFCommon::GetInstance();
 	glTFCommon->Initialize(dxCommon);
+
+	skinningCommon = SkinningCommon::GetInstance();
+	skinningCommon->Initialize(dxCommon);
 
 	modelCommon = new ModelCommon();
 	modelCommon->Initialize(dxCommon);
@@ -83,11 +86,12 @@ void Framework::Finalize() {
 
 	srvManager->Finalize();
 
-	spriteCommon->Finalize();	
+	spriteCommon->Finalize();
 	object3dCommon->Finalize();
 	glTFCommon->Finalize();
+	skinningCommon->Finalize();
 	delete modelCommon;
-	
+
 	particleCommon->Finalize();
 
 	debugWireframes->Finalize();

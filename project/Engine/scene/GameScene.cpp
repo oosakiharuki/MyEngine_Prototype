@@ -9,7 +9,7 @@ void GameScene::Initialize() {
 	ModelManager::GetInstance()->LoadModel("playerHead", ".obj");
 	ModelManager::GetInstance()->LoadModel("enemy", ".obj");
 	ModelManager::GetInstance()->LoadModel("stage_proto", ".obj");
-	ModelManager::GetInstance()->LoadModel("sneakWalk", ".gltf");
+	ModelManager::GetInstance()->LoadModel("sneakWalk", ".gltf",true,true);
 
 
 	camera = new Camera();
@@ -193,8 +193,6 @@ void GameScene::Draw() {
 
 	//モデル描画処理
 	GLTFCommon::GetInstance()->Command();
-	
-	gltfOBJ->Draw();
 
 	//モデル描画処理
 	Object3dCommon::GetInstance()->Command();
@@ -205,6 +203,12 @@ void GameScene::Draw() {
 	for (auto& enemy : enemies) {
 		enemy->Draw();
 	}
+
+	//モデル描画処理
+	SkinningCommon::GetInstance()->Command();
+	
+	gltfOBJ->Draw();
+
 
 	//パーティクル描画処理
 	ParticleCommon::GetInstance()->Command();

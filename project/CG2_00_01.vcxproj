@@ -113,6 +113,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\2d\ImGuiManager.cpp" />
     <ClCompile Include="Engine\3d\Camera.cpp" />
     <ClCompile Include="Engine\3d\_gltf\GLTFCommon.cpp" />
+    <ClCompile Include="Engine\3d\_gltf\SkinningCommon.cpp" />
     <ClCompile Include="Engine\3d\_obj\Model_obj.cpp" />
     <ClCompile Include="Engine\3d\_gltf\Model__glTF.cpp" />
     <ClCompile Include="Engine\3d\_gltf\Object_glTF.cpp" />
@@ -176,6 +177,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\3d\Camera.h" />
     <ClInclude Include="Engine\3d\_gltf\GLTFCommon.h" />
     <ClInclude Include="Engine\3d\_gltf\Model_glTF.h" />
+    <ClInclude Include="Engine\3d\_gltf\SkinningCommon.h" />
     <ClInclude Include="Engine\3d\_obj\Model_obj.h" />
     <ClInclude Include="Engine\3d\_gltf\Object_glTF.h" />
     <ClInclude Include="Engine\3d\_Particle\Particle.h" />

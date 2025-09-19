@@ -87,14 +87,14 @@ private:
 	ModelData_glTF modelData;
 
 
-	Animation animation;
+	std::vector<Animation> animation;
 	///アニメーションタイマー
 	float animationTime = 0.0f;
 	/// 補間タイマー
 	float changeTime = 0.0f;
 	
-	Skeleton skeleton;
-	SkinCluster skinCluster;
+	std::vector<Skeleton> skeletons;
+	std::vector<SkinCluster> skinClusters;
 
 	std::vector<SphereModel*> debugSphere;
 	void SetWireframe();
@@ -102,7 +102,7 @@ private:
 	bool isChange = false;
 
 	//変更前のアニメーション
-	Animation preAnimation;
+	std::vector<Animation> preAnimation;
 
 	Material* material;
 };

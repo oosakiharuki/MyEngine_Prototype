@@ -14,11 +14,11 @@ void TitleScene::Initialize() {
 	GLTFCommon::GetInstance()->SetDefaultCamera(camera);
 
 	ModelManager::GetInstance()->LoadModel("TwoMesh", ".obj");
-	ModelManager::GetInstance()->LoadModel("TwoMesh", ".gltf");
+	ModelManager::GetInstance()->LoadModel("TwoMesh_Anime", ".gltf",true,false);
 
 	twoMesh = new Object_glTF();
 	twoMesh->Initialize();
-	twoMesh->SetModelFile("TwoMesh.gltf");
+	twoMesh->SetModelFile("TwoMesh_Anime.gltf");
 
 	TextureManager::GetInstance()->LoadTexture("resource/rostock_laage_airport_4k.dds");
 
@@ -34,8 +34,8 @@ void TitleScene::Update() {
 	camera->Update();
 	twoMesh->Update(wt);
 
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		//sceneNo = Game;
+	if (Input::GetInstance()->TriggerKey(DIK_1)) {
+		sceneNo = Game;
 	}
 
 	wt.UpdateMatrix();
